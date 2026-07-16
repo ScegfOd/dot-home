@@ -12,6 +12,8 @@ USAGE="\
 Usage: $(basename "$0") [-h] [-u]
 Options:
   -h,--help                 print this help and exit
+  -u,--if-bootstrap-user    do nothing if user isn't found in the
+                            dot-home:dh/bootstrap-user list
 
 This command bootstraps a dot-home configuration for the user specified in
 \$LOGNAME. (POSIX XBD 8.3 specifies that this defaults to the current user.[1])
@@ -49,8 +51,10 @@ clone_or_update() {
 
 }
 
+skip_unlisted=false
 while [[ $# -gt 0 ]]; do case "$1" in
     -h|--help)              shift; echo "$USAGE"; exit 0;;
+    -u|--if-bootstrap-user) shift; skip_unlisted=true;;
     -*)                     die 2 "Unknown option for Test: $1\n" \
                                   " (Use --help for help)";;
     *)                      break;;
@@ -63,6 +67,11 @@ while read logname user_repo_url user_local_repo; do
     [[ -n $user_local_repo ]] || user_local_repo=${user_repo_url##*/}
     break
 done < <(curl -sfL "$DH_BOOTSTRAP_USERS")
+
+if [[ $skip_unlisted == true ]]; then
+    echo "'$LOGNAME' not in '$DH_BOOTSTRAP_USERS', doing nothing."
+    exit 0
+fi
 
 if [[ $logname != $LOGNAME ]]; then
     echo "Warning: cannot find user $LOGNAME in $DH_BOOTSTRAP_USERS"

@@ -37,4 +37,26 @@ grep -q "$expected" $HOME/.bashrc || die 40 "Failure:
         In: $HOME/.bashrc
 "
 
+rm -rf "$HOME"; mkdir -p "$HOME"
+export LOGNAME=dh_test_not_in_dh_bootstrap_users
+$PROJDIR/bootstrap-user
+
+expected=',inb4  _inb4  dot-home'
+  actual="$(LC_COLLATE=C ls -C $HOME/.home)"
+[[ $expected == $actual ]] || die 30 "Failure:
+  Expected: $expected
+    Actual: $actual
+"
+
+rm -rf "$HOME"; mkdir -p "$HOME"
+export LOGNAME=dh_test_not_in_dh_bootstrap_users
+$PROJDIR/bootstrap-user --if-bootstrap-user # in dh/bootstrap_users
+
+expected=''
+  actual="$(LC_COLLATE=C ls -C $HOME/)"
+[[ $expected == $actual ]] || die 30 "Failure:
+  Expected: $expected
+    Actual: $actual
+"
+
 PASSED=true; echo OK
