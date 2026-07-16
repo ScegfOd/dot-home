@@ -14,9 +14,9 @@ rm -rf "$HOME"; mkdir -p "$HOME"
 export LOGNAME=dh_test
 export DH_BOOTSTRAP_USERS="file://$PROJDIR/dh/bootstrap-users"
 
-expected='Usage:'
-  output=$($PROJDIR/bootstrap-user --a-bogus-argument || true)
-  actual="${output:0:6}"
+expected='Unknown'
+  output=$($PROJDIR/bootstrap-user --a-bogus-argument 2>&1 || true)
+  actual="${output:0:7}"
 [[ $expected == $actual ]] || die 30 "Failure:
   Expected: $expected
     Actual: $actual

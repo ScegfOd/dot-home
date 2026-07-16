@@ -9,7 +9,9 @@ dh_local="$HOME/.home/dot-home"
 ####################################################################
 
 USAGE="\
-Usage: $(basename "$0")
+Usage: $(basename "$0") [-h] [-u]
+Options:
+  -h,--help                 print this help and exit
 
 This command bootstraps a dot-home configuration for the user specified in
 \$LOGNAME. (POSIX XBD 8.3 specifies that this defaults to the current user.[1])
@@ -47,7 +49,12 @@ clone_or_update() {
 
 }
 
-[[ "${#@}" -eq 0 ]] || { echo "$USAGE"; exit 2; }
+while [[ $# -gt 0 ]]; do case "$1" in
+    -h|--help)              shift; echo "$USAGE"; exit 0;;
+    -*)                     die 2 "Unknown option for Test: $1\n" \
+                                  " (Use --help for help)";;
+    *)                      break;;
+esac; done
 echo "dot-home bootstrap for user $LOGNAME"
 
 echo "Reading $DH_BOOTSTRAP_USERS"
