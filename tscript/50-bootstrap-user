@@ -13,6 +13,15 @@ export HOME="$PROJDIR/.build/tscript/$(basename "$0")/home"
 rm -rf "$HOME"; mkdir -p "$HOME"
 export LOGNAME=dh_test
 export DH_BOOTSTRAP_USERS="file://$PROJDIR/dh/bootstrap-users"
+
+expected='Usage:'
+  output=$($PROJDIR/bootstrap-user --a-bogus-argument || true)
+  actual="${output:0:6}"
+[[ $expected == $actual ]] || die 30 "Failure:
+  Expected: $expected
+    Actual: $actual
+"
+
 $PROJDIR/bootstrap-user
 
 expected=',inb4  _inb4  cpd  dot-home'
