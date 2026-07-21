@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
-set -euo pipefail
+#
+#   Automatic setup of dot-home on a host/account.
+#   See USAGE below for details.
+#
+set -Eeuo pipefail
+trap 'ec=$?; echo 1>&2 "INTERNAL ERROR: ec=$ec line=$LINENO cmd=$BASH_COMMAND";
+      exit $ec;' ERR
 
 dh_bootstrap_users_default=https://raw.githubusercontent.com/dot-home/dot-home/main/dh/bootstrap-users
 DH_BOOTSTRAP_USERS=${DH_BOOTSTRAP_USERS:-$dh_bootstrap_users_default}
