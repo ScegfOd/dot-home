@@ -73,6 +73,32 @@ fi
 echo "───── Cloning dot-home from $dh_repo"
 clone_or_update "$dh_repo" "$dh_local"
 
+echo '───── Backing up to ~/OLD/'
+#   XXX This does not check dependencies because they have not yet
+#   been cloned, because dot-home has not yet been run. We probably
+#   need a better way to do this, perhaps by asking dot-home to show
+#   us what would conflict before it actually does the install.
+old="$HOME/OLD"; mkdir -p "$old"
+while read dotfile; do
+    homefile="$HOME/.$dotfile"
+    dirname=$(dirname "$dotfile")
+    [[ -f $homefile ]] || continue
+    #   -f on a working symlink is true. But we assume a symlink was
+    #   installed by dot-home and don't back it up.
+    [[ -L $homefile ]] && continue
+    if [[ -f $old/$dotfile ]]; then
+        echo "backup exists: $dotfile"
+    else
+        echo "   backing up: $dotfile"
+        mkdir -p "$old/$dirname"
+        mv "$HOME/.$dotfile" "$old/$dotfile"
+    fi
+done < <(cd "$HOME/.home" \
+    && find */dot/ -type f \
+        | grep -v '^[,_]inb4/' \
+        | sed -e 's/\.inb.$//' -e 's,[^/]*/dot/,,' \
+        | sort -u )
+
 echo "───── Running dot-home-setup"
 "$dh_local"/bin/dot-home-setup
 echo "Test in a new window, or 'source ~/.bashrc'."
